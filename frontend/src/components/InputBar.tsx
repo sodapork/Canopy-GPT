@@ -35,7 +35,7 @@ const InputBar: React.FC<InputBarProps> = ({ onSubmit, isLoading, disabled = fal
           onChange={(e) => setQuestion(e.target.value)}
           onKeyPress={handleKeyPress}
           placeholder="Ask me anything about Canopy's remote monitoring and management platform..."
-          className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 placeholder-gray-700"
           rows={1}
           disabled={isLoading || disabled}
           style={{ minHeight: '48px', maxHeight: '120px' }}
