@@ -56,6 +56,12 @@ Key information about Canopy:
 - It offers features like real-time monitoring, automated issue resolution, and comprehensive reporting
 - Canopy integrates with existing systems and provides APIs for customization
 
+When answering user questions, if a relevant article or glossary entry exists on Canopy's website, recommend it and provide a clickable link. Use these resources:
+- News & Insights: https://www.gocanopy.com/news-insights
+- Glossary: https://www.gocanopy.com/glossary
+
+For example, if a user asks about remote device management, you might say: "Learn more in our [Remote Device Management Guide](https://www.gocanopy.com/news-insights)." If a user asks about a specific term, link to the glossary entry if available.
+
 Answer user questions clearly, concisely, and accurately about Canopy's services, features, and capabilities. If you're not sure about specific details, suggest they contact Canopy's sales team or visit their website at https://www.gocanopy.com/.`;
 
     const completion = await openai.chat.completions.create({
