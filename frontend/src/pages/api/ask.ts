@@ -36,7 +36,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       question,
       timestamp: new Date().toISOString()
     });
-  } catch (error) {
+  } catch {
     res.status(500).json({ error: 'Failed to process your question. Please try again.' });
   }
 } 

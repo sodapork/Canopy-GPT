@@ -73,7 +73,7 @@ export default function Home() {
                 </svg>
               </div>
               <h4 className="text-xl font-semibold text-gray-900 mb-2">Monitor</h4>
-              <p className="text-gray-600">Centralized view of your entire fleet's operational health status</p>
+              <p className="text-gray-600">Centralized view of your entire fleet&apos;s operational health status</p>
             </div>
             
             <div className="text-center p-6">
