@@ -121,7 +121,7 @@ const QAWidget: React.FC<QAWidgetProps> = ({ isOpen, onToggle, className = '' })
       {/* Chat Area */}
       {!isMinimized && (
         <>
-          <div ref={chatBoxRef} className="flex-1 overflow-hidden">
+          <div ref={chatBoxRef} className="flex-1 overflow-y-auto">
             <ChatBox messages={messages} isLoading={isLoading} />
           </div>
           

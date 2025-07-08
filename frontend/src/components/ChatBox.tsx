@@ -44,7 +44,7 @@ const ChatBox: React.FC<ChatBoxProps> = ({ messages, isLoading }) => {
           <div
             className={`max-w-[80%] rounded-lg px-4 py-3 ${
               message.type === 'question'
-                ? 'bg-blue-600 text-white'
+                ? 'bg-blue-600 text-gray-900'
                 : 'bg-white text-gray-800 border border-gray-200'
             }`}
           >
