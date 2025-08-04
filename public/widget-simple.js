@@ -23,7 +23,8 @@
       flex-direction: column;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       overflow: hidden;
-      margin: 20px 0;
+      margin: 20px auto;
+      max-width: calc(100% - 40px);
     `;
     
     widget.innerHTML = `
