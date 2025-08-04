@@ -84,10 +84,34 @@
       </div>
     `;
     
-    // Insert the widget into the current script tag's parent element
+    // Try multiple approaches to find the container
+    let container = null;
+    
+    // Method 1: Look for the script tag and use its parent
     const scriptElement = document.currentScript || document.querySelector('script[src*="widget-embedded.js"]');
     if (scriptElement && scriptElement.parentElement) {
-      scriptElement.parentElement.innerHTML = widgetHTML;
+      container = scriptElement.parentElement;
+    }
+    
+    // Method 2: Look for common Webflow embed containers
+    if (!container) {
+      container = document.querySelector('[data-wf-embed]') || 
+                 document.querySelector('.w-embed') ||
+                 document.querySelector('[class*="embed"]');
+    }
+    
+    // Method 3: Create a new div if we can't find a container
+    if (!container) {
+      container = document.createElement('div');
+      document.body.appendChild(container);
+    }
+    
+    // Insert the widget
+    if (container) {
+      container.innerHTML = widgetHTML;
+      console.log('Canopy widget embedded successfully');
+    } else {
+      console.error('Could not find container for Canopy widget');
     }
   }
 
@@ -147,50 +171,59 @@
 
   // Initialize embedded widget
   function init() {
+    console.log('Initializing Canopy widget...');
     createEmbeddedWidget();
     
-    const form = document.getElementById('canopy-embedded-form');
-    const input = document.getElementById('canopy-embedded-input');
-    
-    if (!form || !input) return;
-    
-    // Handle form submission
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const message = input.value.trim();
-      if (!message) return;
+    // Wait a bit for the DOM to be ready
+    setTimeout(() => {
+      const form = document.getElementById('canopy-embedded-form');
+      const input = document.getElementById('canopy-embedded-input');
       
-      // Add user message
-      addMessage(message, true);
-      input.value = '';
+      if (!form || !input) {
+        console.error('Could not find form or input elements');
+        return;
+      }
       
-      // Show loading
-      const loadingDiv = document.createElement('div');
-      loadingDiv.style.cssText = `
-        display: flex;
-        justify-content: flex-start;
-        margin-bottom: 12px;
-      `;
-      const loadingBubble = document.createElement('div');
-      loadingBubble.style.cssText = `
-        background: white;
-        color: #666;
-        border-radius: 18px;
-        padding: 12px 16px;
-        font-size: 14px;
-        border: 1px solid #e1e5e9;
-      `;
-      loadingBubble.textContent = 'Canopy is typing...';
-      loadingDiv.appendChild(loadingBubble);
-      document.getElementById('canopy-embedded-messages').appendChild(loadingDiv);
+      console.log('Setting up form handlers...');
       
-      // Get response
-      const response = await sendMessage(message);
-      
-      // Remove loading and add response
-      loadingDiv.remove();
-      addMessage(response, false);
-    });
+      // Handle form submission
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const message = input.value.trim();
+        if (!message) return;
+        
+        // Add user message
+        addMessage(message, true);
+        input.value = '';
+        
+        // Show loading
+        const loadingDiv = document.createElement('div');
+        loadingDiv.style.cssText = `
+          display: flex;
+          justify-content: flex-start;
+          margin-bottom: 12px;
+        `;
+        const loadingBubble = document.createElement('div');
+        loadingBubble.style.cssText = `
+          background: white;
+          color: #666;
+          border-radius: 18px;
+          padding: 12px 16px;
+          font-size: 14px;
+          border: 1px solid #e1e5e9;
+        `;
+        loadingBubble.textContent = 'Canopy is typing...';
+        loadingDiv.appendChild(loadingBubble);
+        document.getElementById('canopy-embedded-messages').appendChild(loadingDiv);
+        
+        // Get response
+        const response = await sendMessage(message);
+        
+        // Remove loading and add response
+        loadingDiv.remove();
+        addMessage(response, false);
+      });
+    }, 100);
   }
 
   // Initialize when DOM is ready
