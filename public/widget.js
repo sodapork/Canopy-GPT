@@ -3,7 +3,7 @@
 
   // Configuration
   const config = {
-    apiUrl: 'https://canopy-gpt-front-end.vercel.app/api/chat',
+    apiUrl: 'https://canopy-gpt-front-end-git-master-jp-pophams-projects.vercel.app/api/chat',
     position: 'bottom-right', // bottom-right, bottom-left, top-right, top-left
     primaryColor: '#1a73e8',
     title: 'Canopy Assistant'
