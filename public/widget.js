@@ -9,6 +9,12 @@
     title: 'Canopy Assistant'
   };
 
+  // Check if widget already exists to prevent duplicates
+  if (document.getElementById('canopy-widget')) {
+    console.log('Canopy widget already exists, skipping initialization');
+    return;
+  }
+
   // Create widget HTML
   function createWidget() {
     const widgetHTML = `
@@ -116,40 +122,55 @@
       </div>
     `;
     
-    document.body.insertAdjacentHTML('beforeend', widgetHTML);
+    try {
+      document.body.insertAdjacentHTML('beforeend', widgetHTML);
+      console.log('Canopy widget created successfully');
+    } catch (error) {
+      console.error('Error creating Canopy widget:', error);
+    }
   }
 
   // Add message to chat
   function addMessage(content, isUser = false) {
-    const messagesContainer = document.getElementById('canopy-messages');
-    const messageDiv = document.createElement('div');
-    messageDiv.style.cssText = `
-      display: flex;
-      justify-content: ${isUser ? 'flex-end' : 'flex-start'};
-      margin-bottom: 12px;
-    `;
-    
-    const messageBubble = document.createElement('div');
-    messageBubble.style.cssText = `
-      background: ${isUser ? config.primaryColor : 'white'};
-      color: ${isUser ? 'white' : '#333'};
-      border-radius: 18px;
-      padding: 12px 16px;
-      max-width: 80%;
-      font-size: 14px;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-      border: ${!isUser ? '1px solid #e1e5e9' : 'none'};
-    `;
-    messageBubble.textContent = content;
-    
-    messageDiv.appendChild(messageBubble);
-    messagesContainer.appendChild(messageDiv);
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    try {
+      const messagesContainer = document.getElementById('canopy-messages');
+      if (!messagesContainer) {
+        console.error('Messages container not found');
+        return;
+      }
+      
+      const messageDiv = document.createElement('div');
+      messageDiv.style.cssText = `
+        display: flex;
+        justify-content: ${isUser ? 'flex-end' : 'flex-start'};
+        margin-bottom: 12px;
+      `;
+      
+      const messageBubble = document.createElement('div');
+      messageBubble.style.cssText = `
+        background: ${isUser ? config.primaryColor : 'white'};
+        color: ${isUser ? 'white' : '#333'};
+        border-radius: 18px;
+        padding: 12px 16px;
+        max-width: 80%;
+        font-size: 14px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        border: ${!isUser ? '1px solid #e1e5e9' : 'none'};
+      `;
+      messageBubble.textContent = content;
+      
+      messageDiv.appendChild(messageBubble);
+      messagesContainer.appendChild(messageDiv);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    } catch (error) {
+      console.error('Error adding message:', error);
+    }
   }
 
   // Send message to API
   async function sendMessage(message) {
     try {
+      console.log('Sending message to API:', config.apiUrl);
       const response = await fetch(config.apiUrl, {
         method: 'POST',
         headers: {
@@ -163,8 +184,13 @@
         })
       });
       
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
-      return data.reply;
+      console.log('API response received:', data);
+      return data.reply || 'Sorry, I didn\'t get a proper response. Please try again.';
     } catch (error) {
       console.error('Error sending message:', error);
       return 'Sorry, I\'m having trouble connecting right now. Please try again later.';
@@ -173,73 +199,86 @@
 
   // Initialize widget
   function init() {
-    createWidget();
-    
-    const toggle = document.getElementById('canopy-toggle');
-    const chatWindow = document.getElementById('canopy-chat-window');
-    const closeBtn = document.getElementById('canopy-close');
-    const form = document.getElementById('canopy-form');
-    const input = document.getElementById('canopy-input');
-    
-    // Toggle chat window
-    toggle.addEventListener('click', () => {
-      const isVisible = chatWindow.style.display === 'flex';
-      chatWindow.style.display = isVisible ? 'none' : 'flex';
-      toggle.style.transform = isVisible ? 'none' : 'scale(0.9)';
-      if (!isVisible) {
-        input.focus();
+    try {
+      console.log('Initializing Canopy widget...');
+      createWidget();
+      
+      const toggle = document.getElementById('canopy-toggle');
+      const chatWindow = document.getElementById('canopy-chat-window');
+      const closeBtn = document.getElementById('canopy-close');
+      const form = document.getElementById('canopy-form');
+      const input = document.getElementById('canopy-input');
+      
+      if (!toggle || !chatWindow || !closeBtn || !form || !input) {
+        console.error('Some widget elements not found');
+        return;
       }
-    });
-    
-    // Close chat window
-    closeBtn.addEventListener('click', () => {
-      chatWindow.style.display = 'none';
-      toggle.style.transform = 'none';
-    });
-    
-    // Handle form submission
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const message = input.value.trim();
-      if (!message) return;
       
-      // Add user message
-      addMessage(message, true);
-      input.value = '';
+      // Toggle chat window
+      toggle.addEventListener('click', () => {
+        const isVisible = chatWindow.style.display === 'flex';
+        chatWindow.style.display = isVisible ? 'none' : 'flex';
+        toggle.style.transform = isVisible ? 'none' : 'scale(0.9)';
+        if (!isVisible) {
+          input.focus();
+        }
+      });
       
-      // Show loading
-      const loadingDiv = document.createElement('div');
-      loadingDiv.style.cssText = `
-        display: flex;
-        justify-content: flex-start;
-        margin-bottom: 12px;
-      `;
-      const loadingBubble = document.createElement('div');
-      loadingBubble.style.cssText = `
-        background: white;
-        color: #666;
-        border-radius: 18px;
-        padding: 12px 16px;
-        font-size: 14px;
-        border: 1px solid #e1e5e9;
-      `;
-      loadingBubble.textContent = 'Canopy is typing...';
-      loadingDiv.appendChild(loadingBubble);
-      document.getElementById('canopy-messages').appendChild(loadingDiv);
+      // Close chat window
+      closeBtn.addEventListener('click', () => {
+        chatWindow.style.display = 'none';
+        toggle.style.transform = 'none';
+      });
       
-      // Get response
-      const response = await sendMessage(message);
+      // Handle form submission
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const message = input.value.trim();
+        if (!message) return;
+        
+        // Add user message
+        addMessage(message, true);
+        input.value = '';
+        
+        // Show loading
+        const loadingDiv = document.createElement('div');
+        loadingDiv.style.cssText = `
+          display: flex;
+          justify-content: flex-start;
+          margin-bottom: 12px;
+        `;
+        const loadingBubble = document.createElement('div');
+        loadingBubble.style.cssText = `
+          background: white;
+          color: #666;
+          border-radius: 18px;
+          padding: 12px 16px;
+          font-size: 14px;
+          border: 1px solid #e1e5e9;
+        `;
+        loadingBubble.textContent = 'Canopy is typing...';
+        loadingDiv.appendChild(loadingBubble);
+        document.getElementById('canopy-messages').appendChild(loadingDiv);
+        
+        // Get response
+        const response = await sendMessage(message);
+        
+        // Remove loading and add response
+        loadingDiv.remove();
+        addMessage(response, false);
+      });
       
-      // Remove loading and add response
-      loadingDiv.remove();
-      addMessage(response, false);
-    });
+      console.log('Canopy widget initialized successfully!');
+    } catch (error) {
+      console.error('Error initializing Canopy widget:', error);
+    }
   }
 
   // Initialize when DOM is ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
-    init();
+    // Small delay to ensure DOM is fully ready
+    setTimeout(init, 100);
   }
 })(); 
